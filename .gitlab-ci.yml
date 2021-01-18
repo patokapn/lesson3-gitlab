@@ -1,0 +1,26 @@
+image: node:15
+
+    stages:
+      - build
+      - deploy
+
+    cache:
+      paths:
+        - node_modules/
+
+    install_build:
+      stage: build
+      script:
+        - npm install
+      artifacts:
+        paths:
+          - node_modules/
+    deploy_docker:
+      image: docker:latest
+      stage: deploy
+      services:
+       - docker:dind
+      script:
+       - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+       - docker build -t registry.gitlab.com/patokapn/lesson3-gitlab .
+       - docker push registry.gitlab.com/patokapn/lesson3-gitlab
